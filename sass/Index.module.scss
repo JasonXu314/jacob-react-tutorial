@@ -1,0 +1,21 @@
+.main {
+	padding: 1em;
+	display: grid;
+	grid-template: 'header header' 'previews details' / 1fr 1fr;
+	background: gray;
+
+	.header {
+		font-size: 2em;
+		text-align: center;
+		grid-area: header;
+	}
+
+	.previews {
+		grid-area: previews;
+		list-style: none;
+	}
+
+	.details {
+		grid-area: details;
+	}
+}

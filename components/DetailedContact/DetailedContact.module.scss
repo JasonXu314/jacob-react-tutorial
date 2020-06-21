@@ -1,0 +1,38 @@
+.main {
+	display: grid;
+	grid-template: 'icon name' auto 'icon list' auto '. list' auto / auto 0.9fr;
+
+	.icon {
+		grid-area: icon;
+		width: 80px;
+		height: 80px;
+		border-radius: 50%;
+		margin-top: 30%;
+	}
+
+	.name {
+		grid-area: name;
+		font-size: 1.25em;
+		font-weight: bold;
+	}
+
+	.attributes {
+		grid-area: list;
+		list-style: none;
+		padding: 0;
+		height: fit-content;
+		border: 1px solid black;
+
+		.attribute {
+			padding: 0.25em 0.5em;
+
+			&:nth-child(odd) {
+				background: white;
+			}
+
+			&:nth-child(even) {
+				background: #cccccc;
+			}
+		}
+	}
+}
