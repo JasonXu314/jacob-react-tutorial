@@ -1,21 +1,14 @@
-import { useState } from 'react';
-import Chevron from '../Chevron/Chevron';
-import DetailedContact from '../DetailedContact/DetailedContact';
 import styles from './ContactItem.module.scss';
 
 interface Props {
 	contact: Contact;
+	setShownContact: React.Dispatch<React.SetStateAction<string>>;
 }
 
-const ContactItem: React.FC<Props> = ({ contact }) => {
-	const [details, setDetails] = useState<boolean>(false);
+const ContactItem: React.FC<Props> = ({ contact, setShownContact }) => {
 	return (
-		<li className={styles.main}>
-			<div className={styles.row}>
-				<p className={styles.name}>{contact.name}</p>
-				<Chevron onClick={() => setDetails(!details)} up={details} />
-			</div>
-			{details && <DetailedContact contact={contact} />}
+		<li className={styles.main} onClick={() => setShownContact((shownContact) => (shownContact === contact.name ? '' : contact.name))}>
+			<p className={styles.name}>{contact.name}</p>
 		</li>
 	);
 };

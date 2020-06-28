@@ -1,14 +1,15 @@
 .main {
 	display: grid;
 	grid-template-rows: 1fr auto;
+	cursor: pointer;
+	padding: 0.5em 1em;
 
-	.row {
-		display: flex;
-		flex-direction: row;
-		justify-content: flex-start;
+	&:hover {
+		background: #dfdfdf;
+	}
 
-		* {
-			margin: 0;
-		}
+	.name {
+		margin: 0;
+		user-select: none;
 	}
 }

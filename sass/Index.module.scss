@@ -1,8 +1,7 @@
 .main {
 	padding: 1em;
 	display: grid;
-	grid-template: 'header header' 'previews details' / 1fr 1fr;
-	background: gray;
+	grid-template: 'header header' 'operations operations' 'previews details' / 1fr 1fr;
 
 	.header {
 		font-size: 2em;
@@ -10,12 +9,90 @@
 		grid-area: header;
 	}
 
+	.operations {
+		grid-area: operations;
+		padding: 0.5em;
+
+		.add {
+			padding: 0.25em 0.5em;
+			border: 1px solid #303030;
+			background: white;
+			border-radius: 5px;
+			cursor: pointer;
+		}
+	}
+
 	.previews {
 		grid-area: previews;
-		list-style: none;
+		background: white;
+		border: 1px solid #8f8f8f;
+
+		.list {
+			list-style: none;
+			padding: 0;
+			margin: 0;
+		}
 	}
 
 	.details {
 		grid-area: details;
 	}
+
+	&.blur {
+		filter: blur(4px);
+	}
+}
+
+.menu {
+	border: 2px solid #8f8f8f;
+	border-radius: 1em;
+	width: 25em;
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	z-index: 3;
+	background: white;
+	padding: 1em 2em;
+
+	.row {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		padding: 0.5em;
+	}
+
+	.close {
+		position: absolute;
+		top: 0.5em;
+		right: 0.75em;
+		font-weight: bold;
+		margin: 0;
+		padding: 0;
+		background: none;
+		border: none;
+		cursor: pointer;
+	}
+
+	.submit {
+		padding: 0.25em 0.5em;
+		border: 1px solid #303030;
+		background: white;
+		border-radius: 5px;
+		cursor: pointer;
+		margin-top: 0.5em;
+	}
+
+	.err {
+		color: red;
+	}
+}
+
+.overlay {
+	height: 100%;
+	width: 100%;
+	position: absolute;
+	top: 0;
+	left: 0;
+	background: rgba(0, 0, 0, 0.15);
+	z-index: 2;
 }

@@ -1,12 +1,12 @@
 import { NextPage } from 'next';
 import { useState } from 'react';
 import ContactItem from '../components/ContactItem/ContactItem';
+import DetailedContact from '../components/DetailedContact/DetailedContact';
 import styles from '../sass/Index.module.scss';
 
 /**
  * Contacts Project:
  * Objectives:
- * 		list contacts
  * 		create new/delete contacts
  * 		edit contacts
  * 		use all the data
@@ -26,8 +26,10 @@ const Index: NextPage = () => {
 		{
 			name: 'slois',
 			company: 'Gay',
-			friends: ['manar'],
-			phone: '314-420-6969'
+			friends: ['gayson', 'gaycob'],
+			phone: '314-420-6969',
+			address: null,
+			icon: null
 		},
 		{
 			name: 'gayson',
@@ -42,20 +44,142 @@ const Index: NextPage = () => {
 			company: 'Straight Inc.',
 			friends: ['gayson', 'slois'],
 			phone: '314-555-5555',
-			address: 'Something Greaser St.'
+			address: 'Something Greaser St.',
+			icon: null
 		}
 	]);
+	const [shownContact, setShownContact] = useState<string>('');
+	const [shownAdd, setShownAdd] = useState<boolean>(false);
+	const [err, setErr] = useState<string>('');
+	const [newContact, setNewContact] = useState<NewContact>({
+		name: '',
+		address: '',
+		company: '',
+		phone: ''
+	});
 
 	return (
-		<div className={styles.main}>
-			<h1 className={styles.header}>My Contacts</h1>
-			<ul className={styles.previews}>
-				{contacts.map((contact, i) => (
-					<ContactItem key={i} contact={contact} />
-				))}
-			</ul>
-			<div className={styles.details}></div>
-		</div>
+		<>
+			<div className={styles.main + (shownAdd ? ' ' + styles.blur : '')}>
+				<h1 className={styles.header}>My Contacts</h1>
+				<div className={styles.operations}>
+					<button className={styles.add} onClick={() => setShownAdd(!shownAdd)}>
+						Add Contact
+					</button>
+				</div>
+				<div className={styles.previews}>
+					<ul className={styles.list}>
+						{contacts
+							.sort((a, b) => a.name.localeCompare(b.name))
+							.map((contact, i) => (
+								<ContactItem key={i} contact={contact} setShownContact={setShownContact} />
+							))}
+					</ul>
+				</div>
+				<div className={styles.details}>
+					{contacts.some((contact) => contact.name === shownContact) && (
+						<DetailedContact contact={contacts.find((contact) => shownContact === contact.name)!} />
+					)}
+				</div>
+			</div>
+			{shownAdd && (
+				<div className={styles.menu}>
+					<button className={styles.close} onClick={() => setShownAdd(false)}>
+						X
+					</button>
+					<div className={styles.row}>
+						<label className={styles.label}>Name: </label>
+						<input
+							className={styles.input}
+							value={newContact.name}
+							onChange={(evt) => {
+								const name = evt.target.value;
+								setNewContact((prevContact) => ({
+									...prevContact,
+									name
+								}));
+							}}
+						/>
+					</div>
+					<div className={styles.row}>
+						<label className={styles.label}>Phone: </label>
+						<input
+							className={styles.input}
+							value={newContact.phone}
+							onChange={(evt) => {
+								const phone = evt.target.value;
+								setNewContact((prevContact) => ({
+									...prevContact,
+									phone
+								}));
+							}}
+						/>
+					</div>
+					<div className={styles.row}>
+						<label className={styles.label}>Address: </label>
+						<input
+							className={styles.input}
+							value={newContact.address}
+							onChange={(evt) => {
+								const address = evt.target.value;
+								setNewContact((prevContact) => ({
+									...prevContact,
+									address
+								}));
+							}}
+						/>
+					</div>
+					<div className={styles.row}>
+						<label className={styles.label}>Company: </label>
+						<input
+							className={styles.input}
+							value={newContact.company}
+							onChange={(evt) => {
+								const company = evt.target.value;
+								setNewContact((prevContact) => ({
+									...prevContact,
+									company
+								}));
+							}}
+						/>
+					</div>
+					{err !== '' && <div className={styles.err}>{err}</div>}
+					<button
+						className={styles.submit}
+						onClick={() => {
+							if (newContact.name === '') {
+								setErr('Name cannot be empty!');
+							} else if (newContact.phone === '' || !/$(\d-)?\d{3}-\d{3}-\d{4}^/.test(newContact.phone)) {
+								setErr('Phone must be a valid phone number (###-###-####)');
+							} else {
+								setContacts([
+									...contacts,
+									{
+										friends: [],
+										name: newContact.name,
+										phone: newContact.phone,
+										address: newContact.address === '' ? null : newContact.address,
+										company: newContact.company === '' ? null : newContact.company,
+										icon: null
+									}
+								]);
+								setShownAdd(false);
+								setNewContact({
+									address: '',
+									company: '',
+									name: '',
+									phone: ''
+								});
+								setErr('');
+							}
+						}}
+					>
+						Submit
+					</button>
+				</div>
+			)}
+			{shownAdd && <div className={styles.overlay} onClick={() => setShownAdd(!shownAdd)} />}
+		</>
 	);
 };
 
