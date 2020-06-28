@@ -1,4 +1,14 @@
 .main {
 	display: grid;
 	grid-template-rows: 1fr auto;
+
+	.row {
+		display: flex;
+		flex-direction: row;
+		justify-content: flex-start;
+
+		* {
+			margin: 0;
+		}
+	}
 }
