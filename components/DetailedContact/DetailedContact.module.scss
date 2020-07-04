@@ -1,6 +1,6 @@
 .main {
 	display: grid;
-	grid-template: 'icon name' auto 'icon list' auto '. list' auto / auto 0.9fr;
+	grid-template: 'icon head' auto 'icon list' auto '. list' auto / auto 0.9fr;
 
 	.icon {
 		grid-area: icon;
@@ -10,10 +10,15 @@
 		margin-top: 30%;
 	}
 
-	.name {
-		grid-area: name;
-		font-size: 1.25em;
-		font-weight: bold;
+	.head {
+		grid-area: head;
+		display: grid;
+		grid-template-columns: 2fr 1fr 1fr;
+
+		.name {
+			font-size: 1.25em;
+			font-weight: bold;
+		}
 	}
 
 	.attributes {

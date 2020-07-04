@@ -5,6 +5,7 @@ interface Contact {
 	address: string | null;
 	friends: string[];
 	icon: string | null;
+	id: string;
 }
 
 interface NewContact {
@@ -12,4 +13,5 @@ interface NewContact {
 	company: string;
 	phone: string;
 	address: string;
+	id: string;
 }

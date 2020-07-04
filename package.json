@@ -4,10 +4,12 @@
 	"description": "",
 	"main": "index.js",
 	"dependencies": {
+		"@types/uuid": "^8.0.0",
 		"next": "^9.4.4",
 		"react": "^16.13.1",
 		"react-dom": "^16.13.1",
-		"typescript": "^3.9.5"
+		"typescript": "^3.9.5",
+		"uuid": "^8.2.0"
 	},
 	"devDependencies": {
 		"@types/node": "^14.0.13",
