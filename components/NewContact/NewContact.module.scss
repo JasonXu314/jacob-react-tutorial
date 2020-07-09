@@ -10,11 +10,81 @@
 	background: white;
 	padding: 1em 2em;
 	user-select: none;
+	display: grid;
+	grid-template: 'heading heading' 'icon fields' 'submit .' / 1fr 1fr;
 
-	.row {
-		display: grid;
-		grid-template-columns: 1fr 1fr;
-		padding: 0.5em;
+	h1 {
+		grid-area: heading;
+	}
+
+	.icon {
+		grid-area: icon;
+
+		.file {
+			height: 0;
+			width: 0;
+		}
+
+		.label {
+			cursor: pointer;
+			height: 100px;
+			width: 100px;
+			border-radius: 50%;
+			display: block;
+			margin: auto;
+
+			.image {
+				height: 100px;
+				width: 100px;
+				border-radius: 50%;
+			}
+		}
+	}
+
+	.fields {
+		grid-area: fields;
+
+		.row {
+			display: grid;
+			grid-template-columns: 1fr 1fr;
+			gap: 1em;
+			padding: 0.5em;
+
+			.friends {
+				overflow: visible;
+				display: relative;
+
+				.existing {
+					display: flex;
+					flex-direction: row;
+
+					.friend {
+						padding: 0.1em 0.3em;
+
+						&:hover {
+							text-decoration: line-through;
+							cursor: pointer;
+						}
+					}
+
+					svg {
+						transform: translateY(50%);
+					}
+				}
+
+				.dropdown {
+					background-color: #efefef;
+					border: 1px solid black;
+					border-radius: 0 0 8px 8px;
+					padding: 0.5em 1em;
+					position: absolute;
+
+					.item {
+						cursor: pointer;
+					}
+				}
+			}
+		}
 	}
 
 	.close {
@@ -36,6 +106,7 @@
 		border-radius: 5px;
 		cursor: pointer;
 		margin-top: 0.5em;
+		grid-area: submit;
 	}
 
 	.err {

@@ -7,11 +7,3 @@ interface Contact {
 	icon: string | null;
 	id: string;
 }
-
-interface NewContact {
-	name: string;
-	company: string;
-	phone: string;
-	address: string;
-	id: string;
-}

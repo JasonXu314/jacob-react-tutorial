@@ -59,7 +59,7 @@ const Index: NextPage = () => {
 	const [shownContact, setShownContact] = useState<string>('');
 	const [showAdd, setShowAdd] = useState<boolean>(false);
 	const [showEdit, setShowEdit] = useState<boolean>(false);
-	const [editContact, setEditContact] = useState<NewContact | null>(null);
+	const [editContact, setEditContact] = useState<Contact | null>(null);
 
 	return (
 		<>
@@ -92,8 +92,8 @@ const Index: NextPage = () => {
 					)}
 				</div>
 			</div>
-			{showAdd && <NewContact setShowAdd={setShowAdd} setContacts={setContacts} />}
-			{showEdit && <EditContact setShowEdit={setShowEdit} setContacts={setContacts} editContact={editContact!} />}
+			{showAdd && <NewContact setShowAdd={setShowAdd} setContacts={setContacts} contacts={contacts} />}
+			{showEdit && <EditContact setShowEdit={setShowEdit} setContacts={setContacts} contacts={contacts} editContact={editContact!} />}
 			{(showAdd || showEdit) && (
 				<div
 					className={styles.overlay}

@@ -2,7 +2,7 @@ import styles from './DetailedContact.module.scss';
 
 interface Props {
 	contact: Contact;
-	setEditContact: React.Dispatch<React.SetStateAction<NewContact | null>>;
+	setEditContact: React.Dispatch<React.SetStateAction<Contact | null>>;
 	setShowEdit: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
@@ -15,13 +15,7 @@ const DetailedContact: React.FC<Props> = ({ contact, setEditContact, setShowEdit
 				<button
 					className={styles.edit}
 					onClick={() => {
-						setEditContact({
-							address: contact.address || '',
-							company: contact.company || '',
-							name: contact.name,
-							phone: contact.phone,
-							id: contact.id
-						});
+						setEditContact(contact);
 						setShowEdit(true);
 					}}
 				>
