@@ -2,6 +2,7 @@ import { useState } from 'react';
 import styles from './NewContact.module.scss';
 import { v4 as uuidv4 } from 'uuid';
 import Chevron from '../Chevron/Chevron';
+import axios from 'axios';
 
 interface Props {
 	setShowAdd: React.Dispatch<React.SetStateAction<boolean>>;
@@ -123,7 +124,11 @@ const NewContact: React.FC<Props> = ({ setShowAdd, setContacts, contacts }) => {
 										setNewContact({ ...newContact, friends: newFriends });
 									}}
 								>
-									{friend}
+									{
+										contacts.find((contact) => {
+											return contact.id === friend;
+										})!.name
+									}
 								</div>
 							))}
 							<Chevron size={12} up={dropdownOpen} onClick={() => setDropdownOpen(!dropdownOpen)} />
@@ -132,12 +137,12 @@ const NewContact: React.FC<Props> = ({ setShowAdd, setContacts, contacts }) => {
 							<div className={styles.dropdown}>
 								{contacts.map(
 									(contact) =>
-										!newContact.friends.includes(contact.name) && (
+										!newContact.friends.includes(contact.id) && (
 											<div
 												className={styles.item}
 												key={contact.id}
 												onClick={() => {
-													const friend = contact.name;
+													const friend = contact.id;
 													setNewContact({
 														...newContact,
 														friends: [...newContact.friends, friend]
@@ -163,6 +168,7 @@ const NewContact: React.FC<Props> = ({ setShowAdd, setContacts, contacts }) => {
 						setErr('Phone must be a valid phone number (###-###-####)');
 					} else {
 						setContacts([...contacts, newContact]);
+						axios.post('/api', newContact);
 						setShowAdd(false);
 						setErr('');
 					}

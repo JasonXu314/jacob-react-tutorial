@@ -1,6 +1,7 @@
 import styles from './EditContact.module.scss';
 import { useState } from 'react';
 import Chevron from '../Chevron/Chevron';
+import axios from 'axios';
 
 interface Props {
 	setShowEdit: React.Dispatch<React.SetStateAction<boolean>>;
@@ -113,8 +114,13 @@ const EditContact: React.FC<Props> = ({ setShowEdit, setContacts, editContact, c
 										const newFriends = newContact.friends.filter((f) => f !== friend);
 										setNewContact({ ...newContact, friends: newFriends });
 									}}
+									key={friend}
 								>
-									{friend}
+									{
+										contacts.find((contact) => {
+											return contact.id === friend;
+										})!.name
+									}
 								</div>
 							))}
 							<Chevron size={12} up={dropdownOpen} onClick={() => setDropdownOpen(!dropdownOpen)} />
@@ -123,13 +129,13 @@ const EditContact: React.FC<Props> = ({ setShowEdit, setContacts, editContact, c
 							<div className={styles.dropdown}>
 								{contacts.map(
 									(contact) =>
-										!newContact.friends.includes(contact.name) &&
-										newContact.name !== contact.name && (
+										!newContact.friends.includes(contact.id) &&
+										newContact.id !== contact.id && (
 											<div
 												className={styles.item}
 												key={contact.id}
 												onClick={() => {
-													const friend = contact.name;
+													const friend = contact.id;
 													setNewContact({
 														...newContact,
 														friends: [...newContact.friends, friend]
@@ -155,6 +161,7 @@ const EditContact: React.FC<Props> = ({ setShowEdit, setContacts, editContact, c
 						setErr('Phone must be a valid phone number (###-###-####)');
 					} else {
 						setContacts((contacts) => contacts.filter((contact) => contact.id !== newContact.id).concat({ ...newContact }));
+						axios.patch('/api', newContact);
 						setShowEdit(false);
 					}
 				}}
