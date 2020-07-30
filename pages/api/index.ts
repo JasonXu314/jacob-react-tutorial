@@ -1,44 +1,60 @@
-import { NextApiRequest, NextApiResponse } from 'next';
 import { MongoClient } from 'mongodb';
+import { NextApiRequest, NextApiResponse } from 'next';
 
-export default async (req: NextApiRequest, res: NextApiResponse): Promise<void> => {
+export default async (req: NextApiRequest, res: NextApiResponse<Contact | Contact[] | string>): Promise<void> => {
 	const dbUrl = 'mongodb+srv://admin:admin@todov2.qhboo.mongodb.net/db?retryWrites=true&w=majority';
 	const mongoClient = await MongoClient.connect(dbUrl, { useUnifiedTopology: true });
-	const users = mongoClient.db('db').collection<Contact>('users');
+	const users = mongoClient.db('db').collection<User>('users');
 
 	try {
 		switch (req.method) {
-			case 'GET':
-				if (req.query.contact) {
-					res.status(200).json(await users.findOne({ id: req.query.contact as string }, { projection: { _id: 0 } }));
+			case 'GET': {
+				const _id = req.query.token as string;
+
+				res.status(200).json((await mongoClient.db('db').collection<Contacts>('contacts').findOne({ _id }))!.contacts);
+				break;
+			}
+			case 'POST': {
+				const _id = req.body.token as string;
+
+				if (req.body) {
+					await mongoClient
+						.db('db')
+						.collection<Contacts>('contacts')
+						.findOneAndUpdate({ _id }, { $push: { contacts: req.body.newContact } });
+					res.status(201).end();
 				} else {
-					res.status(200).json(await users.find({}, { projection: { _id: 0 } }).toArray());
+					res.status(400).send('No body');
 				}
 				break;
-			case 'POST':
-				if (req.body) {
-					await users.insertOne(req.body);
-					res.status(200).end();
-				}
-				break;
+			}
 			case 'PATCH':
+				const _id = req.body.token as string;
+				const newContact = req.body.newContact as Contact;
+
 				if (req.body) {
-					await users.findOneAndUpdate({ id: req.body.id }, { $set: { ...req.body } });
+					const contactsItem = (await mongoClient.db('db').collection<Contacts>('contacts').findOne({ _id }))!;
+
+					contactsItem.contacts = contactsItem.contacts.map((contact) => (contact._id === newContact._id ? { ...contact, ...newContact } : contact));
+					await mongoClient.db('db').collection<Contacts>('contacts').findOneAndUpdate({ _id }, contactsItem);
 					res.status(200).end();
+				} else {
+					res.status(400).send('No body');
 				}
 				break;
 			case 'DELETE':
+				// TODO: figure out what to do here
 				if (req.body) {
 					// Delete User
-					await users.findOneAndDelete({ id: req.body.id });
+					await users.findOneAndDelete({ _id: req.body.id });
 
 					// Cleanup
 					const usersArr = await users.find().toArray();
 					const usersToModify = usersArr.filter((user) => user.friends.includes(req.body.id));
-					const ids = usersToModify.map((user) => user.id);
+					const ids = usersToModify.map((user) => user._id);
 					const newFriends = usersToModify.map((user) => user.friends.filter((id) => id !== req.body.id));
 
-					ids.forEach((id, i) => users.findOneAndUpdate({ id }, { $set: { friends: newFriends[i] } }));
+					ids.forEach((id, i) => users.findOneAndUpdate({ _id: id }, { $set: { friends: newFriends[i] } }));
 
 					res.status(200).end();
 				}

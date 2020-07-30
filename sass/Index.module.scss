@@ -48,6 +48,15 @@
 
 	.login {
 		margin: auto;
+
+		.err {
+			margin: 0.25em;
+			color: red;
+		}
+
+		h4 {
+			margin: 0.25em;
+		}
 	}
 }
 

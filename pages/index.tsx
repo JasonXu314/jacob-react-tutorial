@@ -1,13 +1,13 @@
+import axios, { AxiosError } from 'axios';
 import { NextPage } from 'next';
-import { useState, useEffect } from 'react';
+import Head from 'next/head';
+import Link from 'next/link';
+import { useEffect, useState } from 'react';
 import ContactItem from '../components/ContactItem/ContactItem';
 import DetailedContact from '../components/DetailedContact/DetailedContact';
-import styles from '../sass/Index.module.scss';
-import NewContact from '../components/NewContact/NewContact';
 import EditContact from '../components/EditContact/EditContact';
-import Head from 'next/head';
-import { v4 as uuidv4 } from 'uuid';
-import axios from 'axios';
+import NewContact from '../components/NewContact/NewContact';
+import styles from '../sass/Index.module.scss';
 
 const Index: NextPage = () => {
 	const [contacts, setContacts] = useState<Contact[]>([]);
@@ -16,14 +16,17 @@ const Index: NextPage = () => {
 	const [showEdit, setShowEdit] = useState<boolean>(false);
 	const [editContact, setEditContact] = useState<Contact | null>(null);
 	const [token, setToken] = useState<string | null>(null);
-	const [username, setUsername] = useState<string>('');
+	const [name, setName] = useState<string>('');
 	const [password, setPassword] = useState<string>('');
+	const [err, setErr] = useState<string | null>(null);
 
 	useEffect(() => {
-		axios.get('/api').then((res) => {
-			setContacts(res.data);
-		});
-	}, []);
+		if (token) {
+			axios.get(`/api?token=${token}`).then((res) => {
+				setContacts(res.data);
+			});
+		}
+	}, [token]);
 
 	if (token) {
 		return (
@@ -45,6 +48,7 @@ const Index: NextPage = () => {
 								.map((contact, i) => (
 									<ContactItem key={i} contact={contact} setShownContact={setShownContact} />
 								))}
+							{contacts.length === 0 && <li>You have no contacts!</li>}
 						</ul>
 					</div>
 					<div className={styles.details}>
@@ -59,8 +63,8 @@ const Index: NextPage = () => {
 						)}
 					</div>
 				</div>
-				{showAdd && <NewContact setShowAdd={setShowAdd} setContacts={setContacts} contacts={contacts} />}
-				{showEdit && <EditContact setShowEdit={setShowEdit} setContacts={setContacts} contacts={contacts} editContact={editContact!} />}
+				{showAdd && <NewContact setShowAdd={setShowAdd} setContacts={setContacts} contacts={contacts} token={token} />}
+				{showEdit && <EditContact setShowEdit={setShowEdit} setContacts={setContacts} contacts={contacts} editContact={editContact!} token={token} />}
 				{(showAdd || showEdit) && (
 					<div
 						className={styles.overlay}
@@ -83,13 +87,29 @@ const Index: NextPage = () => {
 						className={styles.login}
 						onSubmit={(evt) => {
 							evt.preventDefault();
-						}}
-					>
-						<h4>Username</h4>
-						<input type="text" value={username} onChange={(evt) => setUsername(evt.target.value)} />
+
+							axios
+								.post<string>('/api/login', { name, password })
+								.then((res) => {
+									setToken(res.data);
+								})
+								.catch((err: AxiosError<string>) => {
+									setErr(err.response?.data || 'Unknown Error Occured');
+								});
+						}}>
+						<h4>Name</h4>
+						<input type="text" value={name} onChange={(evt) => setName(evt.target.value)} autoFocus />
 						<h4>Password</h4>
-						<input type="text" value={password} onChange={(evt) => setPassword(evt.target.value)} />
-						<button type="submit">Log In</button>
+						<input type="password" value={password} onChange={(evt) => setPassword(evt.target.value)} />
+						<div>
+							<button type="submit">Log In</button>
+						</div>
+						<div>
+							<Link href="/signup">
+								<a>No Account? Sign up!</a>
+							</Link>
+						</div>
+						{err && <p className={styles.err}>{err}</p>}
 					</form>
 				</div>
 			</>

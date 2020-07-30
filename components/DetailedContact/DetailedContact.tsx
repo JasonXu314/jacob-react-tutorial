@@ -1,5 +1,5 @@
-import styles from './DetailedContact.module.scss';
 import axios from 'axios';
+import styles from './DetailedContact.module.scss';
 
 interface Props {
 	contact: Contact;
@@ -20,27 +20,23 @@ const DetailedContact: React.FC<Props> = ({ contacts, contact, setEditContact, s
 					onClick={() => {
 						setEditContact(contact);
 						setShowEdit(true);
-					}}
-				>
+					}}>
 					Edit
 				</button>
 				<button
 					className={styles.delete}
 					onClick={() => {
-						axios.delete('/api', { data: { id: contact.id } });
-						const newContacts = contacts.filter((ct) => {
-							return contact.id !== ct.id;
-						});
+						axios.delete('/api', { data: { id: contact._id } });
+						const newContacts = contacts.filter((ct) => contact._id !== ct._id);
 						contacts.forEach((cont) => {
-							if (cont.friends.includes(contact.id)) {
+							if (cont.friends.includes(contact._id)) {
 								cont.friends = cont.friends.filter((friend) => {
-									return friend !== contact.id;
+									return friend !== contact._id;
 								});
 							}
 						});
 						setContacts(newContacts);
-					}}
-				>
+					}}>
 					Delete
 				</button>
 			</div>
@@ -49,7 +45,7 @@ const DetailedContact: React.FC<Props> = ({ contacts, contact, setEditContact, s
 				<li className={styles.attribute}>Company: {contact.company || 'Unknown'}</li>
 				<li className={styles.attribute}>Address: {contact.address || 'Unknown'}</li>
 				<li className={styles.attribute}>
-					Friends: {contact.friends.map((uuid) => contacts.find((otherContact) => uuid === otherContact.id)!.name).join(', ')}
+					Friends: {contact.friends.map((uuid) => contacts.find((otherContact) => uuid === otherContact._id)!.name).join(', ')}
 				</li>
 			</ul>
 		</div>

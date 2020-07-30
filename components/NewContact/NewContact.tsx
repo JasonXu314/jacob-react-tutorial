@@ -1,16 +1,17 @@
+import axios from 'axios';
 import { useState } from 'react';
-import styles from './NewContact.module.scss';
 import { v4 as uuidv4 } from 'uuid';
 import Chevron from '../Chevron/Chevron';
-import axios from 'axios';
+import styles from './NewContact.module.scss';
 
 interface Props {
 	setShowAdd: React.Dispatch<React.SetStateAction<boolean>>;
 	setContacts: React.Dispatch<React.SetStateAction<Contact[]>>;
 	contacts: Contact[];
+	token: string;
 }
 
-const NewContact: React.FC<Props> = ({ setShowAdd, setContacts, contacts }) => {
+const NewContact: React.FC<Props> = ({ setShowAdd, setContacts, contacts, token }) => {
 	const [err, setErr] = useState<string>('');
 	const [dropdownOpen, setDropdownOpen] = useState<boolean>(false);
 	const [newContact, setNewContact] = useState<Contact>({
@@ -18,7 +19,7 @@ const NewContact: React.FC<Props> = ({ setShowAdd, setContacts, contacts }) => {
 		address: '',
 		company: '',
 		phone: '',
-		id: uuidv4(),
+		_id: uuidv4(),
 		icon: null,
 		friends: []
 	});
@@ -122,13 +123,8 @@ const NewContact: React.FC<Props> = ({ setShowAdd, setContacts, contacts }) => {
 									onClick={() => {
 										const newFriends = newContact.friends.filter((f) => f !== friend);
 										setNewContact({ ...newContact, friends: newFriends });
-									}}
-								>
-									{
-										contacts.find((contact) => {
-											return contact.id === friend;
-										})!.name
-									}
+									}}>
+									{contacts.find((contact) => contact._id === friend)!.name}
 								</div>
 							))}
 							<Chevron size={12} up={dropdownOpen} onClick={() => setDropdownOpen(!dropdownOpen)} />
@@ -137,18 +133,17 @@ const NewContact: React.FC<Props> = ({ setShowAdd, setContacts, contacts }) => {
 							<div className={styles.dropdown}>
 								{contacts.map(
 									(contact) =>
-										!newContact.friends.includes(contact.id) && (
+										!newContact.friends.includes(contact._id) && (
 											<div
 												className={styles.item}
-												key={contact.id}
+												key={contact._id}
 												onClick={() => {
-													const friend = contact.id;
+													const friend = contact._id;
 													setNewContact({
 														...newContact,
 														friends: [...newContact.friends, friend]
 													});
-												}}
-											>
+												}}>
 												{contact.name}
 											</div>
 										)
@@ -168,12 +163,11 @@ const NewContact: React.FC<Props> = ({ setShowAdd, setContacts, contacts }) => {
 						setErr('Phone must be a valid phone number (###-###-####)');
 					} else {
 						setContacts([...contacts, newContact]);
-						axios.post('/api', newContact);
+						axios.post('/api', { token, newContact });
 						setShowAdd(false);
 						setErr('');
 					}
-				}}
-			>
+				}}>
 				Submit
 			</button>
 		</div>

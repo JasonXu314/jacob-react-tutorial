@@ -1,16 +1,17 @@
-import styles from './EditContact.module.scss';
+import axios from 'axios';
 import { useState } from 'react';
 import Chevron from '../Chevron/Chevron';
-import axios from 'axios';
+import styles from './EditContact.module.scss';
 
 interface Props {
 	setShowEdit: React.Dispatch<React.SetStateAction<boolean>>;
 	setContacts: React.Dispatch<React.SetStateAction<Contact[]>>;
 	editContact: Contact;
 	contacts: Contact[];
+	token: string;
 }
 
-const EditContact: React.FC<Props> = ({ setShowEdit, setContacts, editContact, contacts }) => {
+const EditContact: React.FC<Props> = ({ setShowEdit, setContacts, editContact, contacts, token }) => {
 	const [newContact, setNewContact] = useState<Contact>(editContact);
 	const [err, setErr] = useState<string>('');
 	const [dropdownOpen, setDropdownOpen] = useState<boolean>(false);
@@ -114,11 +115,10 @@ const EditContact: React.FC<Props> = ({ setShowEdit, setContacts, editContact, c
 										const newFriends = newContact.friends.filter((f) => f !== friend);
 										setNewContact({ ...newContact, friends: newFriends });
 									}}
-									key={friend}
-								>
+									key={friend}>
 									{
 										contacts.find((contact) => {
-											return contact.id === friend;
+											return contact._id === friend;
 										})!.name
 									}
 								</div>
@@ -129,19 +129,18 @@ const EditContact: React.FC<Props> = ({ setShowEdit, setContacts, editContact, c
 							<div className={styles.dropdown}>
 								{contacts.map(
 									(contact) =>
-										!newContact.friends.includes(contact.id) &&
-										newContact.id !== contact.id && (
+										!newContact.friends.includes(contact._id) &&
+										newContact._id !== contact._id && (
 											<div
 												className={styles.item}
-												key={contact.id}
+												key={contact._id}
 												onClick={() => {
-													const friend = contact.id;
+													const friend = contact._id;
 													setNewContact({
 														...newContact,
 														friends: [...newContact.friends, friend]
 													});
-												}}
-											>
+												}}>
 												{contact.name}
 											</div>
 										)
@@ -160,12 +159,11 @@ const EditContact: React.FC<Props> = ({ setShowEdit, setContacts, editContact, c
 					} else if (newContact.phone === '' || !/^(\d-)?\d{3}-\d{3}-\d{4}$/.test(newContact.phone)) {
 						setErr('Phone must be a valid phone number (###-###-####)');
 					} else {
-						setContacts((contacts) => contacts.filter((contact) => contact.id !== newContact.id).concat({ ...newContact }));
-						axios.patch('/api', newContact);
+						setContacts((contacts) => contacts.filter((contact) => contact._id !== newContact._id).concat({ ...newContact }));
+						axios.patch('/api', { token, newContact });
 						setShowEdit(false);
 					}
-				}}
-			>
+				}}>
 				Apply
 			</button>
 		</div>
