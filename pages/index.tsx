@@ -59,6 +59,7 @@ const Index: NextPage = () => {
 								contact={contacts.find((contact) => shownContact === contact.name)!}
 								setEditContact={setEditContact}
 								setShowEdit={setShowEdit}
+								token={token}
 							/>
 						)}
 					</div>
@@ -87,7 +88,6 @@ const Index: NextPage = () => {
 						className={styles.login}
 						onSubmit={(evt) => {
 							evt.preventDefault();
-
 							axios
 								.post<string>('/api/login', { name, password })
 								.then((res) => {
@@ -96,7 +96,8 @@ const Index: NextPage = () => {
 								.catch((err: AxiosError<string>) => {
 									setErr(err.response?.data || 'Unknown Error Occured');
 								});
-						}}>
+						}}
+					>
 						<h4>Name</h4>
 						<input type="text" value={name} onChange={(evt) => setName(evt.target.value)} autoFocus />
 						<h4>Password</h4>

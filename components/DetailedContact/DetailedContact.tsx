@@ -7,9 +7,10 @@ interface Props {
 	setShowEdit: React.Dispatch<React.SetStateAction<boolean>>;
 	contacts: Contact[];
 	setContacts: React.Dispatch<React.SetStateAction<Contact[]>>;
+	token: string;
 }
 
-const DetailedContact: React.FC<Props> = ({ contacts, contact, setEditContact, setShowEdit, setContacts }) => {
+const DetailedContact: React.FC<Props> = ({ contacts, contact, setEditContact, setShowEdit, setContacts, token }) => {
 	return (
 		<div className={styles.main}>
 			{contact.icon ? <img src={contact.icon} alt="no photo" className={styles.icon} /> : <div className={styles.icon}>No Icon</div>}
@@ -20,13 +21,14 @@ const DetailedContact: React.FC<Props> = ({ contacts, contact, setEditContact, s
 					onClick={() => {
 						setEditContact(contact);
 						setShowEdit(true);
-					}}>
+					}}
+				>
 					Edit
 				</button>
 				<button
 					className={styles.delete}
 					onClick={() => {
-						axios.delete('/api', { data: { id: contact._id } });
+						axios.delete('/api', { data: { token, _id: contact._id } });
 						const newContacts = contacts.filter((ct) => contact._id !== ct._id);
 						contacts.forEach((cont) => {
 							if (cont.friends.includes(contact._id)) {
@@ -36,7 +38,8 @@ const DetailedContact: React.FC<Props> = ({ contacts, contact, setEditContact, s
 							}
 						});
 						setContacts(newContacts);
-					}}>
+					}}
+				>
 					Delete
 				</button>
 			</div>

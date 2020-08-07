@@ -25,7 +25,7 @@ export default async (req: NextApiRequest, res: NextApiResponse): Promise<void> 
 					.db('db')
 					.collection<User>('users')
 					.insertOne({ _id, address: null, company: null, friends: [], icon: null, name, password: hashedPassword, phone, secret: salt });
-				await mongoClient.db('db').collection<Contacts>('contacts').insertOne({ _id, contacts: [] });
+				await mongoClient.db('db').collection<ContactsEntry>('contacts').insertOne({ _id, contacts: [] });
 				res.status(200).end();
 				break;
 			default:

@@ -1,4 +1,4 @@
-interface Contacts {
+interface ContactsEntry {
 	_id: string;
 	contacts: Contact[];
 }

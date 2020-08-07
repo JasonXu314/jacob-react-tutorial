@@ -5,13 +5,14 @@ export default async (req: NextApiRequest, res: NextApiResponse<Contact | Contac
 	const dbUrl = 'mongodb+srv://admin:admin@todov2.qhboo.mongodb.net/db?retryWrites=true&w=majority';
 	const mongoClient = await MongoClient.connect(dbUrl, { useUnifiedTopology: true });
 	const users = mongoClient.db('db').collection<User>('users');
+	const contacts = mongoClient.db('db').collection<ContactsEntry>('contacts');
 
 	try {
 		switch (req.method) {
 			case 'GET': {
 				const _id = req.query.token as string;
 
-				res.status(200).json((await mongoClient.db('db').collection<Contacts>('contacts').findOne({ _id }))!.contacts);
+				res.status(200).json((await contacts.findOne({ _id }))!.contacts);
 				break;
 			}
 			case 'POST': {
@@ -20,7 +21,7 @@ export default async (req: NextApiRequest, res: NextApiResponse<Contact | Contac
 				if (req.body) {
 					await mongoClient
 						.db('db')
-						.collection<Contacts>('contacts')
+						.collection<ContactsEntry>('contacts')
 						.findOneAndUpdate({ _id }, { $push: { contacts: req.body.newContact } });
 					res.status(201).end();
 				} else {
@@ -33,10 +34,13 @@ export default async (req: NextApiRequest, res: NextApiResponse<Contact | Contac
 				const newContact = req.body.newContact as Contact;
 
 				if (req.body) {
-					const contactsItem = (await mongoClient.db('db').collection<Contacts>('contacts').findOne({ _id }))!;
+					const contactsItem = (await mongoClient.db('db').collection<ContactsEntry>('contacts').findOne({ _id }))!;
 
 					contactsItem.contacts = contactsItem.contacts.map((contact) => (contact._id === newContact._id ? { ...contact, ...newContact } : contact));
-					await mongoClient.db('db').collection<Contacts>('contacts').findOneAndUpdate({ _id }, contactsItem);
+					await mongoClient
+						.db('db')
+						.collection<ContactsEntry>('contacts')
+						.findOneAndUpdate({ _id }, { $set: { ...contactsItem } });
 					res.status(200).end();
 				} else {
 					res.status(400).send('No body');
@@ -46,16 +50,18 @@ export default async (req: NextApiRequest, res: NextApiResponse<Contact | Contac
 				// TODO: figure out what to do here
 				if (req.body) {
 					// Delete User
-					await users.findOneAndDelete({ _id: req.body.id });
+					const _id = req.body.token as string;
+					const deleteId = req.body._id as string;
+
+					const contactEntry = await contacts.findOne({ _id });
+					const newContacts = contactEntry!.contacts.filter((contact) => contact._id === deleteId);
 
 					// Cleanup
-					const usersArr = await users.find().toArray();
-					const usersToModify = usersArr.filter((user) => user.friends.includes(req.body.id));
-					const ids = usersToModify.map((user) => user._id);
-					const newFriends = usersToModify.map((user) => user.friends.filter((id) => id !== req.body.id));
+					const cleanedContacts = newContacts.map((contact) =>
+						contact.friends.includes(deleteId) ? { ...contact, friends: contact.friends.filter((id) => id !== deleteId) } : contact
+					);
 
-					ids.forEach((id, i) => users.findOneAndUpdate({ _id: id }, { $set: { friends: newFriends[i] } }));
-
+					await contacts.findOneAndUpdate({ _id }, { $set: { contacts: cleanedContacts } });
 					res.status(200).end();
 				}
 				break;
